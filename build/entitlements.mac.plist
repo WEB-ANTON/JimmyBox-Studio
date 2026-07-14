@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <!-- Standard hardened-runtime entitlements an Electron app needs -->
+  <key>com.apple.security.cs.allow-jit</key>
+  <true/>
+  <key>com.apple.security.cs.allow-unsigned-executable-memory</key>
+  <true/>
+  <key>com.apple.security.cs.allow-dyld-environment-variables</key>
+  <true/>
+  <!-- Needed because the app shells out to external binaries (limactl) and may
+       later bundle helpers signed under a different identity -->
+  <key>com.apple.security.cs.disable-library-validation</key>
+  <true/>
+  <!-- Lima runs the VM via Apple's Virtualization.framework (vz driver); the
+       bundled limactl (signed with entitlementsInherit) needs this entitlement,
+       otherwise VZ start fails with VZErrorDomain Code=2 under hardened runtime. -->
+  <key>com.apple.security.virtualization</key>
+  <true/>
+  <key>com.apple.security.inherit</key>
+  <true/>
+</dict>
+</plist>

@@ -1,0 +1,18 @@
+images:
+  - location: "https://cloud-images.ubuntu.com/releases/22.04/release/ubuntu-22.04-server-cloudimg-arm64.img"
+    arch: "aarch64"
+vmType: "vz"
+cpus: ${CPUS}
+memory: "${MEMORY}GiB"
+mounts:
+  - location: ${SITES_PATH}
+    mountPoint: "/var/www/sites"
+    writable: true
+networks:
+  - vzNAT: true
+provision:
+  - mode: system
+    script: |
+${PROVISION_SCRIPT}
+ssh:
+  loadDotSSHPubKeys: false

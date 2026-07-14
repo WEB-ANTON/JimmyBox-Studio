@@ -1,0 +1,66 @@
+name: Bug report
+description: Report a reproducible JimmyBox Studio problem
+title: "[Bug]: "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Do not include secrets, tokens, customer data, private dumps, or private project archives.
+  - type: input
+    id: version
+    attributes:
+      label: JimmyBox Studio version
+      placeholder: "1.0.0"
+    validations:
+      required: true
+  - type: input
+    id: macos
+    attributes:
+      label: macOS version and Mac model
+      placeholder: "macOS 15.x, MacBook Pro M3"
+    validations:
+      required: true
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      options:
+        - VM
+        - Projects
+        - Import
+        - Database
+        - Hosts
+        - Checkpoints
+        - Upgrade to Multiuser
+        - UI
+        - Build/Release
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual behavior
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      placeholder: |
+        1. Start VM
+        2. Create project ...
+        3. ...
+    validations:
+      required: true
+  - type: textarea
+    id: context
+    attributes:
+      label: Additional context
+      description: CMS, PHP version, upgrade context, screenshots, or non-sensitive logs.

@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>JimmyBox Hosts</title>
+    <link rel="stylesheet" href="./tray.css">
+  </head>
+  <body>
+    <section class="popover">
+      <header class="titlebar">
+        <h1 data-i18n="tray.title">JimmyBox Hosts</h1>
+      </header>
+
+      <div class="toolbar">
+        <button id="open-studio" type="button" data-i18n="tray.openStudio">Open Studio</button>
+        <button id="refresh" type="button" data-i18n="common.refresh" aria-label="Refresh">Refresh</button>
+      </div>
+
+      <main id="hosts-list" class="hosts-list"></main>
+
+      <footer id="status" class="status"></footer>
+    </section>
+    <script src="./i18n.js"></script>
+    <script src="./tray.js"></script>
+  </body>
+</html>

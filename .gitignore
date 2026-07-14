@@ -1,0 +1,15 @@
+node_modules/
+dist/
+.DS_Store
+npm-debug.log*
+vendor/
+hub/data/
+.env.signing
+.env
+.env.*
+PLAN-*.md
+release-assets/
+*.p12
+*.cer
+*.certSigningRequest
+*.provisionprofile

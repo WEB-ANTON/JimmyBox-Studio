@@ -1,0 +1,562 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>JimmyBox Studio</title>
+    <link rel="stylesheet" href="./styles.css">
+  </head>
+  <body>
+    <div class="app-shell">
+      <header class="topbar">
+        <div>
+          <h1>JimmyBox Studio</h1>
+          <p id="stack-strip">Local Ubuntu VM · PHP · MariaDB · Redis</p>
+        </div>
+        <div class="vm-controls">
+          <span id="vm-status" class="status-pill is-muted">checking</span>
+          <button id="vm-start" type="button" data-i18n-title="vm.startHelp">Start</button>
+          <button id="vm-stop" type="button" data-i18n-title="vm.stopHelp">Stop</button>
+          <button id="vm-provision" type="button" data-i18n-title="vm.provisionHelp">Provision</button>
+        </div>
+      </header>
+
+      <div id="activity" class="activity" role="status" aria-live="polite" hidden>
+        <button id="activity-summary" type="button" class="activity-summary" aria-expanded="false" aria-controls="activity-steps">
+          <span id="activity-icon" class="activity-icon" aria-hidden="true"></span>
+          <span id="activity-title" class="activity-title"></span>
+          <span id="activity-count" class="activity-count"></span>
+          <span class="activity-caret" aria-hidden="true">▾</span>
+        </button>
+        <ol id="activity-steps" class="activity-steps" hidden></ol>
+      </div>
+
+      <nav class="tabs" aria-label="Sections">
+        <button class="tab is-active" type="button" data-tab="projects" data-i18n="tab.projects">Projects</button>
+        <button class="tab" type="button" data-tab="database" data-i18n="tab.database">Database</button>
+        <button class="tab" type="button" data-tab="hosts" data-i18n="tab.hosts">Hosts</button>
+        <button class="tab" type="button" data-tab="settings" data-i18n="tab.settings">Settings</button>
+        <button class="tab" type="button" data-tab="faq" data-i18n="tab.faq">FAQ</button>
+      </nav>
+
+      <main>
+        <section id="tab-projects" class="panel">
+          <div class="section-head">
+            <h2 data-i18n="proj.title">Projects</h2>
+            <button id="refresh-projects" type="button" data-i18n="common.refresh">Refresh</button>
+          </div>
+          <div class="grid two">
+            <div class="surface">
+              <div style="overflow-x: auto;">
+              <table>
+                <thead>
+                  <tr>
+                    <th data-i18n="th.domain">Domain</th>
+                    <th data-i18n="th.cms">CMS</th>
+                    <th data-i18n="th.php">PHP</th>
+                    <th data-i18n="th.db">DB</th>
+                    <th data-i18n="th.hosts">Hosts</th>
+                    <th data-i18n="th.enabled">Enabled</th>
+                    <th data-i18n="th.actions">Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="projects-list"></tbody>
+              </table>
+              </div>
+            </div>
+            <form id="project-form" class="surface form-stack">
+              <h3 data-i18n="proj.new">New Project</h3>
+              <label>
+                <span data-i18n="lbl.domain">Domain</span>
+                <input id="project-domain" name="domain" type="text" placeholder="kunde.com" required>
+              </label>
+              <label>
+                <span data-i18n="lbl.php">PHP</span>
+                <select id="project-php" name="phpVersion"></select>
+                <small id="project-php-hint" class="muted small"></small>
+              </label>
+              <label>
+                <span data-i18n="lbl.cms">CMS</span>
+                <select id="project-cms" name="cms"></select>
+              </label>
+              <label>
+                <span data-i18n="lbl.database">Database</span>
+                <input id="project-db" name="dbName" type="text" placeholder="kunde_com">
+              </label>
+              <label class="check-row" id="project-plugins-row">
+                <input id="project-plugins" name="installPlugins" type="checkbox">
+                <span data-i18n="proj.installPlugins">Install base plugins</span>
+              </label>
+              <button type="submit" data-i18n="proj.create">Create Project</button>
+            </form>
+          </div>
+          <div class="surface form-stack">
+            <h3 data-i18n="import.title">Import existing project</h3>
+            <p class="muted small" data-i18n="import.hint">Drop in a code archive of a live site plus its database dump — JimmyBox runs it locally under the same production domain via your hosts file.</p>
+            <label>
+              <span data-i18n="import.domain">Domain (same as production)</span>
+              <input id="import-domain" type="text" placeholder="www.kunde.com">
+            </label>
+            <label>
+              <span data-i18n="lbl.php">PHP</span>
+              <select id="import-php"></select>
+            </label>
+            <label>
+              <span data-i18n="import.archive">Code archive (.zip / .tar.gz)</span>
+              <div class="path-row">
+                <input id="import-archive" type="text" readonly placeholder="…">
+                <button id="import-pick-archive" type="button" data-i18n="common.pick">Pick</button>
+              </div>
+            </label>
+            <label>
+              <span data-i18n="import.dump">Database dump (.sql / .sql.gz, optional)</span>
+              <div class="path-row">
+                <input id="import-dump" type="text" readonly placeholder="…">
+                <button id="import-pick-dump" type="button" data-i18n="common.pick">Pick</button>
+              </div>
+            </label>
+            <button id="import-run" type="button" class="primary" data-i18n="import.run">Import project</button>
+          </div>
+          <div class="surface history-panel">
+            <div class="section-head compact">
+              <div>
+                <h3 data-i18n="history.title">History</h3>
+                <p class="muted small" data-i18n="history.hint">Project checkpoints for code, database, media, and setup.</p>
+              </div>
+              <div class="head-actions">
+                <select id="checkpoint-domain"></select>
+                <button id="checkpoint-refresh" type="button" data-i18n="common.refresh">Refresh</button>
+                <button id="checkpoint-create" type="button" class="primary" data-i18n="history.new">Create Checkpoint</button>
+              </div>
+            </div>
+            <div class="history-compare">
+              <select id="checkpoint-a"></select>
+              <select id="checkpoint-b"></select>
+              <button id="checkpoint-compare" type="button" data-i18n="history.compare">Compare</button>
+            </div>
+            <div id="checkpoint-list" class="checkpoint-list"></div>
+            <div id="checkpoint-diff" class="checkpoint-diff"></div>
+          </div>
+        </section>
+
+        <section id="tab-database" class="panel" hidden>
+          <div class="section-head">
+            <h2 data-i18n="db.title">Database</h2>
+            <div class="head-actions">
+              <button id="open-phpmyadmin" type="button">phpMyAdmin</button>
+              <button id="refresh-db" type="button" data-i18n="common.refresh">Refresh</button>
+            </div>
+          </div>
+          <div class="grid two">
+            <div class="surface">
+              <form id="db-form" class="inline-form">
+                <input id="db-name" type="text" placeholder="database_name" data-i18n-ph="db.namePh" required>
+                <button type="submit" data-i18n="common.create">Create</button>
+              </form>
+              <form id="db-import-form" class="inline-form">
+                <input id="db-import-name" type="text" placeholder="database_name" data-i18n-ph="db.namePh" required>
+                <label class="check-row compact-check">
+                  <input id="db-import-create" type="checkbox" checked>
+                  <span data-i18n="db.createIfMissing">Create if missing</span>
+                </label>
+                <button type="submit" data-i18n="common.import">Import</button>
+              </form>
+              <ul id="db-list" class="list"></ul>
+              <form id="db-export-form" class="export-panel" hidden>
+                <div class="section-head compact">
+                  <h3 id="db-export-title" data-i18n="db.exportTitle">Export</h3>
+                  <button id="db-export-cancel" type="button" data-i18n="common.close">Close</button>
+                </div>
+                <div class="export-grid">
+                  <label>
+                    <span data-i18n="db.content">Content</span>
+                    <select id="db-export-content">
+                      <option value="full" data-i18n="db.full">Full</option>
+                      <option value="structure" data-i18n="db.structureOnly">Structure only</option>
+                      <option value="data" data-i18n="db.dataOnly">Data only</option>
+                    </select>
+                  </label>
+                  <label>
+                    <span data-i18n="db.charset">Charset</span>
+                    <input id="db-export-charset" type="text" value="utf8mb4" required>
+                  </label>
+                  <label>
+                    <span data-i18n="db.tables">Tables</span>
+                    <select id="db-export-table-mode">
+                      <option value="all" data-i18n="db.allTables">All tables</option>
+                      <option value="selected" data-i18n="db.selectedTables">Selected tables</option>
+                    </select>
+                  </label>
+                  <label>
+                    <span data-i18n="db.selection">Selection</span>
+                    <select id="db-export-tables" multiple size="7"></select>
+                  </label>
+                </div>
+                <div class="option-grid">
+                  <label class="check-row"><input id="db-export-drop" type="checkbox" checked><span data-i18n="db.optDrop">Add DROP TABLE</span></label>
+                  <label class="check-row"><input id="db-export-routines" type="checkbox" checked><span data-i18n="db.optRoutines">Stored routines</span></label>
+                  <label class="check-row"><input id="db-export-triggers" type="checkbox" checked><span data-i18n="db.optTriggers">Triggers</span></label>
+                  <label class="check-row"><input id="db-export-events" type="checkbox"><span data-i18n="db.optEvents">Events</span></label>
+                  <label class="check-row"><input id="db-export-transaction" type="checkbox" checked><span data-i18n="db.optSnapshot">Consistent snapshot</span></label>
+                  <label class="check-row"><input id="db-export-extended" type="checkbox" checked><span data-i18n="db.optExtended">Extended inserts</span></label>
+                  <label class="check-row"><input id="db-export-complete" type="checkbox"><span data-i18n="db.optComplete">Complete inserts</span></label>
+                  <label class="check-row"><input id="db-export-hex" type="checkbox" checked><span data-i18n="db.optHex">Hex binary</span></label>
+                  <label class="check-row"><input id="db-export-gzip" type="checkbox"><span data-i18n="db.optGzip">Gzip output</span></label>
+                </div>
+                <button type="submit" data-i18n="common.export">Export</button>
+              </form>
+            </div>
+          </div>
+
+          <div class="surface browse-panel">
+            <div class="section-head compact">
+              <h3 data-i18n="db.browse">Browse &amp; query</h3>
+              <div class="inline-form">
+                <select id="browse-db"></select>
+                <button id="browse-refresh-tables" type="button" data-i18n="db.tables">Tables</button>
+              </div>
+            </div>
+            <div id="browse-tables" class="php-chips"></div>
+            <textarea id="browse-sql" rows="3" placeholder="SELECT * FROM ...  — or click a table above to browse it" data-i18n-ph="db.sqlPh"></textarea>
+            <div class="inline-form" style="margin-top: 10px;">
+              <button id="browse-run" type="button" class="primary" data-i18n="common.run">Run</button>
+              <span class="muted small" data-i18n="db.tip">Tip: add e.g. WHERE name LIKE '%term%' to search.</span>
+            </div>
+            <div id="browse-results" class="browse-results"></div>
+          </div>
+        </section>
+
+        <section id="tab-hosts" class="panel" hidden>
+          <div class="section-head">
+            <h2 data-i18n="hosts.title">Hosts</h2>
+            <div class="head-actions">
+              <button id="refresh-hosts" type="button" data-i18n="common.refresh">Refresh</button>
+              <button id="apply-hosts" type="button" class="primary" data-i18n="hosts.apply">Apply to system</button>
+            </div>
+          </div>
+          <p class="hint" data-i18n-html="hosts.hint">Toggle, group, and add remote lists freely — nothing is written to your system until you press <strong>Apply to system</strong>. The hosts helper asks once for admin approval and then updates only the JimmyBox block.</p>
+
+          <div class="grid two">
+            <div id="hosts-groups" class="stack"></div>
+
+            <div class="stack">
+              <form id="hosts-group-form" class="surface inline-form">
+                <input id="hosts-group-name" type="text" placeholder="New group name" data-i18n-ph="hosts.newGroupPh" required>
+                <button type="submit" data-i18n="hosts.addGroup">Add group</button>
+              </form>
+
+              <div class="surface" data-block-id="hosts-remotes-block">
+                <h3 data-i18n="hosts.remoteLists">Remote lists</h3>
+                <div id="hosts-remotes" class="stack"></div>
+                <form id="hosts-remote-form" class="form-stack remote-form">
+                  <input id="hosts-remote-name" type="text" placeholder="Name (e.g. client hosts)" data-i18n-ph="hosts.remoteNamePh">
+                  <input id="hosts-remote-url" type="url" placeholder="https://example.com/hosts" required>
+                  <button type="submit" data-i18n="hosts.addRemote">Add remote</button>
+                </form>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section id="tab-settings" class="panel" hidden>
+          <div class="section-head">
+            <h2 data-i18n="set.title">Settings</h2>
+            <div class="head-actions">
+              <button id="open-faq" type="button" data-i18n="set.faqBtn">Guide &amp; FAQ</button>
+            </div>
+          </div>
+          <form id="settings-form" class="settings-stack">
+            <div class="surface form-stack" data-block-id="settings-general" data-block-title="General">
+              <label>
+                <span data-i18n="set.language">Language</span>
+                <select id="settings-language">
+                  <option value="de">Deutsch</option>
+                  <option value="en">English</option>
+                </select>
+              </label>
+              <label>
+                <span data-i18n="set.sitesPath">Sites Path</span>
+                <div class="path-row">
+                  <input id="settings-sites-path" type="text" required>
+                  <button id="pick-sites-path" type="button" data-i18n="common.pick">Pick</button>
+                </div>
+              </label>
+              <label>
+                <span data-i18n="set.basePlugins">Base Plugins</span>
+                <textarea id="settings-base-plugins" rows="3" placeholder="query-monitor, classic-editor"></textarea>
+              </label>
+            </div>
+            <div class="surface form-stack" data-block-id="settings-php" data-block-title="PHP">
+              <label>
+                <span data-i18n="set.defaultPhp">Default PHP</span>
+                <select id="settings-default-php"></select>
+              </label>
+              <label>
+                <span data-i18n="set.phpInstalled">PHP versions installed</span>
+                <div id="php-installed" class="php-chips"></div>
+              </label>
+              <label>
+                <span data-i18n="set.addPhp">Add PHP version</span>
+                <div class="path-row">
+                  <input id="php-install-version" type="text" placeholder="e.g. 8.4">
+                  <button id="php-install-btn" type="button" data-i18n="common.install">Install</button>
+                </div>
+                <p class="note small" data-i18n="set.phpNote">Installs from the ondrej PPA into the VM; new versions then appear in the dropdowns automatically.</p>
+              </label>
+            </div>
+            <div class="surface form-stack" data-block-id="settings-vm" data-block-title="VM resources">
+              <div class="two-col">
+                <label>
+                  <span data-i18n="set.cpus">CPUs</span>
+                  <input id="settings-cpus" type="number" min="1" max="12" step="1">
+                </label>
+                <label>
+                  <span data-i18n="set.memory">Memory (GiB)</span>
+                  <input id="settings-memory" type="number" min="1" max="32" step="1">
+                </label>
+              </div>
+              <div class="path-row">
+                <button id="apply-resources-btn" type="button" data-i18n="set.applyResources">Apply CPU / RAM to VM (restarts it)</button>
+              </div>
+            </div>
+            <button type="submit" data-i18n="set.save">Save Settings</button>
+          </form>
+        </section>
+
+        <section id="tab-faq" class="panel" hidden>
+          <div class="section-head">
+            <h2 data-i18n="faq.title">Guide &amp; FAQ</h2>
+          </div>
+
+          <!-- ==================== GERMAN FAQ ==================== -->
+          <div class="faq" data-faq-lang="de">
+            <p class="faq-lead">
+              Praxis-Guide für JimmyBox Studio: Schnellstart, lokale Domains, CMS-Projekte,
+              Datenbank-Workflows, Checkpoints, Upgrade-Hinweise und die wichtigsten Stellen für
+              Fehleranalyse.
+            </p>
+
+            <nav class="faq-toc">
+              <a href="#faq-start-de">Schnellstart</a>
+              <a href="#faq-upgrade-de">Multiuser später</a>
+              <a href="#faq-arch-de">Architektur</a>
+              <a href="#faq-projects-de">Projekte</a>
+              <a href="#faq-data-de">Daten &amp; DB</a>
+              <a href="#faq-checkpoints-de">Checkpoints</a>
+              <a href="#faq-trouble-de">Troubleshooting</a>
+            </nav>
+
+            <h3 id="faq-start-de" class="faq-h">Schnellstart</h3>
+            <div class="surface faq-card">
+              <dl class="faq-dl">
+                <dt>Ich arbeite alleine. Was muss ich tun?</dt>
+                <dd>App öffnen, <strong>Start</strong> drücken, warten bis die VM läuft, unter Projekte ein Projekt anlegen und mit <strong>Öffnen</strong> starten. Alles läuft lokal in JimmyBox Studio.</dd>
+                <dt>Kann ich später auf Multiuser wechseln?</dt>
+                <dd>Ja. Die Solo-App verwendet dieselbe App-ID, denselben App-Namen und dieselben lokalen Datenpfade. Projekte, VM, Datenbanken, Hosts-Einträge und lokale Checkpoints bleiben erhalten, wenn später die Multiuser-Version installiert wird.</dd>
+                <dt>Wo liegen lokale Projekte?</dt>
+                <dd>Standardmäßig in <code>~/JimmyboxStudio/Sites</code>. Der Pfad kann in den Einstellungen geändert werden. Die alte JimmyBox/Vagrant-Installation wird nicht angefasst.</dd>
+                <dt>Was brauche ich für den Alltag?</dt>
+                <dd>Die Projekttabelle, den Datenbankbereich, Hosts und Checkpoints. Alle wichtigen Aktionen laufen lokal in der App.</dd>
+              </dl>
+            </div>
+
+            <h3 id="faq-upgrade-de" class="faq-h">Später auf Multiuser wechseln</h3>
+            <div class="surface faq-card">
+              <dl class="faq-dl">
+                <dt>Was bleibt erhalten?</dt>
+                <dd>Die lokale VM, der Sites-Ordner, Projektdaten, Datenbanken, Hosts-Einstellungen, Checkpoints und kompatible Projekt-Metadaten bleiben am selben Ort.</dd>
+                <dt>Was ändert die Multiuser-Version?</dt>
+                <dd>Sie ergänzt Reservierungen, gemeinsames Auschecken, Push/Pull, Benutzer und Server-Synchronisation. Die Solo-Projekte müssen dafür nicht neu angelegt werden.</dd>
+                <dt>Was sollte ich vorher tun?</dt>
+                <dd>Vor dem Wechsel einen lokalen Checkpoint erstellen und die App schließen. Danach die Multiuser-App wie ein normales Update installieren.</dd>
+              </dl>
+            </div>
+
+            <h3 id="faq-arch-de" class="faq-h">Architektur</h3>
+            <div class="surface faq-card">
+              <dl class="faq-dl">
+                <dt>Was läuft lokal?</dt>
+                <dd>Eine Lima-VM mit Ubuntu 22.04, Apache, PHP-FPM 7.4 bis 8.3, MariaDB, Redis und Composer. Lima ist in der App gebundelt.</dd>
+                <dt>Wo liegen Projekte?</dt>
+                <dd>Standard: <code>~/JimmyboxStudio/Sites/&lt;domain&gt;</code>. In der VM ist das als <code>/var/www/sites/&lt;domain&gt;</code> gemountet.</dd>
+                <dt>Welche Domains werden verwendet?</dt>
+                <dd>Studio canonicalisiert führendes <code>www.</code>. Ein Projekt <code>kunde.at</code> bekommt automatisch Hosts, SSL-SAN und Apache-Alias für <code>kunde.at</code> und <code>www.kunde.at</code>.</dd>
+                <dt>Was wird an <code>/etc/hosts</code> geändert?</dt>
+                <dd>Nur der markierte JimmyBox-Block. Projekt-Hosts zeigen auf die echte VM-IP <code>192.168.64.x</code>, nicht auf localhost.</dd>
+              </dl>
+            </div>
+
+            <h3 id="faq-projects-de" class="faq-h">Projekte &amp; CMS</h3>
+            <div class="surface faq-card">
+              <dl class="faq-dl">
+                <dt>Was macht „Projekt erstellen"?</dt>
+                <dd>Ordner, Docroot, vHost, SSL-Zertifikat, Datenbank, Setup-Descriptor und optional CMS-Scaffold werden angelegt. Wiederholen ist idempotent und repariert fehlende Runtime-Teile.</dd>
+                <dt>Welche CMS werden unterstützt?</dt>
+                <dd>WordPress, TYPO3, Contao, Drupal, Joomla und Plain PHP. Der Adapter bestimmt Docroot, Medien-Pfade, DB-Konfig und Setup-Routinen.</dd>
+                <dt>Wie funktioniert „Öffnen"?</dt>
+                <dd>Studio repariert vHost/SSL/Metadaten, aktiviert die Hosts-Einträge und öffnet die bevorzugte HTTPS-URL. Bei Apex-Domains wird <code>https://www.domain</code> geöffnet.</dd>
+                <dt>Wie wechsle ich PHP?</dt>
+                <dd>Die Dropdowns in der Projekttabelle schreiben den vHost auf den passenden PHP-FPM-Socket um und reloaden Apache. Zusätzliche Versionen kommen über Einstellungen → PHP-Version hinzufügen.</dd>
+              </dl>
+            </div>
+
+            <h3 id="faq-data-de" class="faq-h">Import, Datenbank &amp; Medien</h3>
+            <div class="surface faq-card">
+              <dl class="faq-dl">
+                <dt>Wie importiere ich eine Live-Seite?</dt>
+                <dd>Code-Archiv und optional SQL-Dump wählen, Produktionsdomain eintragen. Die Domain bleibt unverändert; lokal zeigt sie per Hosts-Datei auf die VM. Das vermeidet spätere URL-Rewrites beim Deploy.</dd>
+                <dt>Was macht der Import mit der CMS-Konfiguration?</dt>
+                <dd>Die DB-Zugangsdaten werden auf die lokale MariaDB gesetzt. WordPress bekommt zusätzlich einen lokalen URL-Override, der den aktuellen Host aus dem Request verwendet.</dd>
+                <dt>Wie komme ich in die Datenbank?</dt>
+                <dd>In der App über Datenbank durchsuchen oder über den phpMyAdmin-Button. Login: Server <code>localhost</code>, Benutzer <code>root</code>, Passwort <code>root</code>.</dd>
+                <dt>Wo liegen Medien?</dt>
+                <dd>Im Setup-Descriptor unter <code>mediaPaths[]</code>. Checkpoints verwenden diese Pfade CMS-übergreifend, nicht nur WordPress-Uploads.</dd>
+              </dl>
+            </div>
+
+            <h3 id="faq-checkpoints-de" class="faq-h">Checkpoints</h3>
+            <div class="surface faq-card">
+              <dl class="faq-dl">
+                <dt>Was speichert ein Checkpoint?</dt>
+                <dd>Code-Referenz, DB-Dump, Medienarchiv und <code>.jimmybox-studio/setup.json</code>. Wiederherstellen legt vorher Sicherheitsbackups an.</dd>
+                <dt>Wann sind Checkpoints sinnvoll?</dt>
+                <dd>Vor riskanten Plugin-/CMS-Updates, großen Imports, Datenmigrationen oder anderen größeren Änderungen.</dd>
+                <dt>Was bedeutet „anheften"?</dt>
+                <dd>Gepinnte Checkpoints werden von der Aufräumlogik nicht gelöscht.</dd>
+              </dl>
+            </div>
+
+            <h3 id="faq-trouble-de" class="faq-h">Troubleshooting</h3>
+            <div class="surface faq-card">
+              <dl class="faq-dl">
+                <dt>Domain zeigt die falsche Site</dt>
+                <dd>Projekt einmal über <strong>Öffnen</strong> starten. Dadurch werden vHost, SSL-Aliase und Hosts-Einträge repariert.</dd>
+                <dt>HTTPS-Warnung im Browser</dt>
+                <dd>Lokale Zertifikate sind selbstsigniert. Die Ausnahme muss pro Domain einmal bestätigt werden.</dd>
+                <dt>phpMyAdmin zeigt Konfigurationsspeicher-Warnung</dt>
+                <dd>phpMyAdmin über den Button erneut öffnen. Studio legt Konfigurationsdatenbank, Tabellen und TempDir automatisch nach.</dd>
+                <dt>DMG/App wird als beschädigt gemeldet</dt>
+                <dd>Die unsignierte Test-DMG ist nicht notarisiert. Für Weitergabe braucht es Developer-ID-Signing und Notarisierung.</dd>
+              </dl>
+            </div>
+          </div>
+
+          <!-- ==================== ENGLISH FAQ ==================== -->
+          <div class="faq" data-faq-lang="en" hidden>
+            <p class="faq-lead">
+              Practical guide for JimmyBox Studio: quickstart, local domains, CMS projects,
+              database workflows, checkpoints, upgrade notes, and the first places to check when
+              something does not behave as expected.
+            </p>
+
+            <nav class="faq-toc">
+              <a href="#faq-start-en">Quickstart</a>
+              <a href="#faq-upgrade-en">Multiuser later</a>
+              <a href="#faq-arch-en">Architecture</a>
+              <a href="#faq-projects-en">Projects</a>
+              <a href="#faq-data-en">Data &amp; DB</a>
+              <a href="#faq-checkpoints-en">Checkpoints</a>
+              <a href="#faq-trouble-en">Troubleshooting</a>
+            </nav>
+
+            <h3 id="faq-start-en" class="faq-h">Quickstart</h3>
+            <div class="surface faq-card">
+              <dl class="faq-dl">
+                <dt>I work alone. What do I need?</dt>
+                <dd>Open the app, press <strong>Start</strong>, wait for the VM, create a project under Projects, then press <strong>Open</strong>. Everything runs locally in JimmyBox Studio.</dd>
+                <dt>Can I add Multiuser later?</dt>
+                <dd>Yes. The Solo app uses the same app ID, app name, and local data paths. Projects, VM state, databases, hosts entries, and local checkpoints remain in place when the Multiuser app is installed later.</dd>
+                <dt>Where are local projects stored?</dt>
+                <dd>Default: <code>~/JimmyboxStudio/Sites</code>. You can change it in Settings. The legacy JimmyBox/Vagrant setup is not touched.</dd>
+                <dt>What do I use day to day?</dt>
+                <dd>The project table, database tools, hosts management, and checkpoints. All normal actions run locally in the app.</dd>
+              </dl>
+            </div>
+
+            <h3 id="faq-upgrade-en" class="faq-h">Upgrade To Multiuser Later</h3>
+            <div class="surface faq-card">
+              <dl class="faq-dl">
+                <dt>What is preserved?</dt>
+                <dd>The local VM, Sites folder, project files, databases, hosts settings, checkpoints, and compatible project metadata stay in the same place.</dd>
+                <dt>What does the Multiuser app add?</dt>
+                <dd>Reservations, shared checkout, push/pull, users, and server synchronization. Solo projects do not need to be recreated.</dd>
+                <dt>What should I do first?</dt>
+                <dd>Create a local checkpoint and quit the app. Then install the Multiuser app like a normal update.</dd>
+              </dl>
+            </div>
+
+            <h3 id="faq-arch-en" class="faq-h">Architecture</h3>
+            <div class="surface faq-card">
+              <dl class="faq-dl">
+                <dt>What runs locally?</dt>
+                <dd>A Lima VM with Ubuntu 22.04, Apache, PHP-FPM 7.4 through 8.3, MariaDB, Redis and Composer. Lima is bundled with the app.</dd>
+                <dt>Where are projects stored?</dt>
+                <dd>Default: <code>~/JimmyboxStudio/Sites/&lt;domain&gt;</code>. Inside the VM this is mounted at <code>/var/www/sites/&lt;domain&gt;</code>.</dd>
+                <dt>How are domains handled?</dt>
+                <dd>Studio canonicalizes leading <code>www.</code>. A project <code>client.com</code> automatically gets hosts, SSL SANs and Apache aliases for both <code>client.com</code> and <code>www.client.com</code>.</dd>
+                <dt>What changes in <code>/etc/hosts</code>?</dt>
+                <dd>Only the marked JimmyBox block. Project hosts point at the real VM IP <code>192.168.64.x</code>, not localhost.</dd>
+              </dl>
+            </div>
+
+            <h3 id="faq-projects-en" class="faq-h">Projects &amp; CMS</h3>
+            <div class="surface faq-card">
+              <dl class="faq-dl">
+                <dt>What does Create Project do?</dt>
+                <dd>It creates the folder, docroot, vHost, SSL certificate, database, setup descriptor and optional CMS scaffold. Running it again is idempotent and repairs missing runtime pieces.</dd>
+                <dt>Which CMS are supported?</dt>
+                <dd>WordPress, TYPO3, Contao, Drupal, Joomla and Plain PHP. The adapter defines docroot, media paths, DB config and setup routines.</dd>
+                <dt>What does Open do?</dt>
+                <dd>Studio repairs vHost/SSL/metadata, enables hosts entries and opens the preferred HTTPS URL. Apex domains open as <code>https://www.domain</code>.</dd>
+                <dt>How do I switch PHP?</dt>
+                <dd>The project table dropdown rewrites the vHost to the matching PHP-FPM socket and reloads Apache. Additional versions are installed from Settings → Add PHP version.</dd>
+              </dl>
+            </div>
+
+            <h3 id="faq-data-en" class="faq-h">Import, Database &amp; Media</h3>
+            <div class="surface faq-card">
+              <dl class="faq-dl">
+                <dt>How do I import a live site?</dt>
+                <dd>Choose a code archive, optionally a SQL dump, and enter the production domain. The domain stays unchanged; locally it resolves to the VM through hosts. That keeps deploys free of URL rewrites.</dd>
+                <dt>What does import change in CMS config?</dt>
+                <dd>Database credentials are pointed at local MariaDB. WordPress also gets a local URL override that derives the URL from the current request host.</dd>
+                <dt>How do I access the database?</dt>
+                <dd>Use Browse &amp; Query in the app, or the phpMyAdmin button. Login: server <code>localhost</code>, user <code>root</code>, password <code>root</code>.</dd>
+                <dt>Where is media stored?</dt>
+                <dd>In the setup descriptor under <code>mediaPaths[]</code>. Checkpoints use those CMS-aware paths, not only WordPress uploads.</dd>
+              </dl>
+            </div>
+
+            <h3 id="faq-checkpoints-en" class="faq-h">Checkpoints</h3>
+            <div class="surface faq-card">
+              <dl class="faq-dl">
+                <dt>What does a checkpoint store?</dt>
+                <dd>Code reference, DB dump, media archive and <code>.jimmybox-studio/setup.json</code>. Restore creates safety backups first.</dd>
+                <dt>When should I create one?</dt>
+                <dd>Before risky plugin/CMS updates, large imports, data migrations, or other larger changes.</dd>
+                <dt>What does pin mean?</dt>
+                <dd>Pinned checkpoints are not deleted by retention cleanup.</dd>
+              </dl>
+            </div>
+
+            <h3 id="faq-trouble-en" class="faq-h">Troubleshooting</h3>
+            <div class="surface faq-card">
+              <dl class="faq-dl">
+                <dt>Domain shows the wrong site</dt>
+                <dd>Open the project once via <strong>Open</strong>. That repairs vHost, SSL aliases and hosts entries.</dd>
+                <dt>Browser shows an HTTPS warning</dt>
+                <dd>Local certificates are self-signed. Confirm the exception once per domain.</dd>
+                <dt>phpMyAdmin shows a configuration storage warning</dt>
+                <dd>Open phpMyAdmin via the button again. Studio creates the config database, tables and TempDir automatically.</dd>
+                <dt>DMG/App is reported as damaged</dt>
+                <dd>The unsigned test DMG is not notarized. Distribution to other Macs needs Developer ID signing and notarization.</dd>
+              </dl>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+    <script src="./i18n.js"></script>
+    <script src="./renderer.js"></script>
+  </body>
+</html>

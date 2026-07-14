@@ -1,0 +1,66 @@
+{
+  "name": "jimmybox-studio",
+  "version": "1.0.0",
+  "description": "A standalone macOS desktop app for local JimmyBox Studio PHP and CMS development.",
+  "main": "main.js",
+  "productName": "JimmyBox Studio",
+  "author": "JimmyBox Studio",
+  "license": "UNLICENSED",
+  "private": true,
+  "scripts": {
+    "start": "electron .",
+    "test": "node --test src/core/team/*.test.js src/*.test.js",
+    "fetch-lima": "bash scripts/fetch-lima.sh",
+    "app": "npm run fetch-lima && CSC_IDENTITY_AUTO_DISCOVERY=false electron-builder --mac --arm64 --dir -c.mac.notarize=false -c.mac.identity=null",
+    "dist": "npm run release:notarized",
+    "dist:signed": "npm run fetch-lima && electron-builder --mac --arm64 --publish=never -c.mac.notarize=false",
+    "dist:unsigned": "npm run fetch-lima && CSC_IDENTITY_AUTO_DISCOVERY=false electron-builder --mac --arm64 -c.mac.notarize=false -c.mac.identity=null",
+    "notary:store": "bash scripts/notary-store-credentials.sh",
+    "notary:submit": "bash scripts/notary-submit-dmg.sh",
+    "release:notarized": "bash scripts/release-notarized.sh"
+  },
+  "build": {
+    "appId": "at.webanton.jimmybox-studio",
+    "productName": "JimmyBox Studio",
+    "directories": {
+      "output": "dist",
+      "buildResources": "build"
+    },
+    "files": [
+      "main.js",
+      "preload.js",
+      "tray-preload.js",
+      "package.json",
+      "src/**/*",
+      "!src/**/*.test.js",
+      "!src/core/team/**/*",
+      "!src/ipc/team.ipc.js",
+      "node_modules/**/*"
+    ],
+    "extraResources": [
+      { "from": "vendor/lima", "to": "lima" }
+    ],
+    "mac": {
+      "category": "public.app-category.developer-tools",
+      "target": [
+        { "target": "dmg", "arch": "arm64" }
+      ],
+      "icon": "src/assets/icon.icns",
+      "hardenedRuntime": true,
+      "gatekeeperAssess": false,
+      "entitlements": "build/entitlements.mac.plist",
+      "entitlementsInherit": "build/entitlements.mac.plist",
+      "notarize": true
+    },
+    "dmg": {
+      "title": "JimmyBox Studio ${version}"
+    }
+  },
+  "dependencies": {
+    "electron-store": "^8.2.0"
+  },
+  "devDependencies": {
+    "electron": ">=28",
+    "electron-builder": "^24.13.3"
+  }
+}

@@ -1,0 +1,1226 @@
+:root {
+  color-scheme: dark;
+  --bg: #1a1a1c;
+  --surface: #26262a;
+  --input-bg: #1f1f22;
+  --text: #e9e9ec;
+  --muted: #9a9aa2;
+  --line: #38383e;
+  --accent: #3b9dff;
+  --accent-dark: #2f86e0;
+  --success: #4ec77f;
+  --danger: #ff6b60;
+  --tint-success: rgba(78, 199, 127, 0.16);
+  --tint-neutral: rgba(255, 255, 255, 0.07);
+  --tint-warning: rgba(240, 170, 60, 0.16);
+  --warning-text: #f0b352;
+  --radius: 8px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-width: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-size: 14px;
+  line-height: 1.45;
+}
+
+/* The `hidden` attribute must always win over class-based `display` (e.g.
+   .grid / .form-stack), otherwise conditionally-hidden blocks like the team
+   onboarding, the admin panel, or the new-user result stay visible. */
+[hidden] {
+  display: none !important;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+button {
+  min-height: 34px;
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  padding: 6px 12px;
+  background: var(--surface);
+  color: var(--text);
+  cursor: pointer;
+}
+
+button:hover {
+  border-color: var(--accent);
+}
+
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible,
+a:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--accent) 72%, #ffffff);
+  outline-offset: 2px;
+}
+
+button:disabled {
+  cursor: wait;
+  opacity: 0.55;
+}
+
+button.inline-link {
+  min-height: 0;
+  border: 0;
+  padding: 0;
+  background: transparent;
+  color: var(--accent);
+}
+
+button[type="submit"],
+#vm-start,
+button.primary {
+  border-color: var(--accent);
+  background: var(--accent);
+  color: #ffffff;
+}
+
+button[type="submit"]:hover,
+#vm-start:hover,
+button.primary:hover {
+  background: var(--accent-dark);
+}
+
+input,
+select,
+textarea {
+  width: 100%;
+  min-height: 36px;
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  padding: 7px 10px;
+  background: var(--input-bg);
+  color: var(--text);
+}
+
+textarea {
+  resize: vertical;
+}
+
+.app-shell {
+  /* Grow with the window (spreads out on wide screens); the window's own
+     minWidth (960) is the lower floor, so content never shrinks into ugly
+     wrapping — dense tables scroll horizontally instead. */
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 24px;
+}
+
+.topbar {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 14px;
+  padding-bottom: 18px;
+}
+
+h1,
+h2,
+h3,
+p {
+  margin: 0;
+}
+
+h1 {
+  font-size: 24px;
+  font-weight: 600;
+  letter-spacing: 0;
+}
+
+h2 {
+  font-size: 22px;
+  font-weight: 560;
+  letter-spacing: 0;
+}
+
+h3 {
+  font-size: 16px;
+  font-weight: 560;
+  letter-spacing: 0;
+}
+
+.topbar p {
+  margin-top: 5px;
+  color: var(--muted);
+}
+
+.vm-controls,
+.section-head,
+.inline-form,
+.path-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.vm-controls {
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.status-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  min-height: 28px;
+  border-radius: 999px;
+  padding: 4px 12px;
+  background: var(--tint-success);
+  color: var(--success);
+  font-weight: 560;
+}
+
+.status-pill::before {
+  content: "";
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.status-pill.is-muted {
+  background: var(--tint-neutral);
+  color: var(--muted);
+}
+
+.status-pill.is-stopped {
+  background: var(--tint-warning);
+  color: var(--warning-text);
+}
+
+.status-pill.is-danger {
+  background: rgba(255, 107, 96, 0.16);
+  color: var(--danger);
+}
+
+.chip {
+  display: inline-block;
+  padding: 2px 9px;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  background: var(--tint-neutral);
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.chip.warn {
+  border-color: var(--warning-text);
+  color: var(--warning-text);
+}
+
+.pill.warn {
+  background: var(--tint-warning);
+  color: var(--warning-text);
+}
+
+.cell-domain {
+  font-weight: 560;
+}
+
+.php-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.php-inline {
+  width: auto;
+  min-height: 30px;
+  padding: 3px 8px;
+}
+
+.two-col {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+}
+
+.settings-divider {
+  height: 1px;
+  background: var(--line);
+  margin: 2px 0;
+}
+
+/* Global activity log: one concise, collapsible line + optional details. */
+.activity {
+  margin: 0 0 16px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--surface);
+  overflow: hidden;
+}
+
+.activity.is-ok {
+  border-color: color-mix(in srgb, var(--success) 45%, var(--line));
+}
+
+.activity.is-bad {
+  border-color: color-mix(in srgb, var(--danger) 55%, var(--line));
+}
+
+.activity-summary {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 10px 14px;
+  border: 0;
+  background: transparent;
+  color: var(--text);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.activity-summary:hover {
+  background: var(--input-bg);
+}
+
+.activity-icon {
+  flex: none;
+  width: 20px;
+  height: 20px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  font-size: 12px;
+  font-weight: 700;
+  color: #fff;
+  background: var(--muted);
+}
+
+.activity.is-ok .activity-icon { background: var(--success); }
+.activity.is-bad .activity-icon { background: var(--danger); }
+.activity.is-running .activity-icon { background: transparent; color: var(--muted); }
+
+.activity-title {
+  font-weight: 600;
+}
+
+.activity-count {
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.activity-caret {
+  margin-left: auto;
+  color: var(--muted);
+  transition: transform 0.15s ease;
+}
+
+.activity.is-open .activity-caret {
+  transform: rotate(180deg);
+}
+
+.activity-steps {
+  margin: 0;
+  padding: 4px 10px 10px;
+  list-style: none;
+  display: grid;
+  gap: 4px;
+  border-top: 1px solid var(--line);
+}
+
+.activity-steps li {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  padding: 4px 6px;
+  font-size: 13px;
+  border-radius: 6px;
+}
+
+.activity-step-icon {
+  flex: none;
+  width: 14px;
+  font-weight: 700;
+}
+
+.activity-steps li.is-ok .activity-step-icon { color: var(--success); }
+.activity-steps li.is-bad .activity-step-icon { color: var(--danger); }
+.activity-steps li.is-skip .activity-step-icon { color: var(--muted); }
+.activity-steps li.is-bad { background: color-mix(in srgb, var(--danger) 10%, transparent); }
+
+.activity-step-name {
+  flex: none;
+  font-weight: 500;
+}
+
+.activity-step-msg {
+  color: var(--muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Admin: create-user form + generated token/invite result. */
+.create-user-form {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.create-user-form input {
+  flex: 1 1 150px;
+  min-width: 0;
+}
+
+.create-user-form select {
+  flex: 0 0 auto;
+}
+
+.new-user-result {
+  display: grid;
+  gap: 6px;
+  margin-bottom: 12px;
+  padding: 10px 12px;
+  border: 1px solid color-mix(in srgb, var(--success) 45%, var(--line));
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--success) 8%, transparent);
+}
+
+.new-user-result .ok {
+  color: var(--success);
+  font-weight: 600;
+}
+
+.new-user-result .secret {
+  width: 100%;
+  padding: 6px 8px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: var(--input-bg);
+  color: var(--text);
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 12px;
+  resize: vertical;
+}
+
+
+.history-compare {
+  display: grid;
+  grid-template-columns: 1fr 1fr auto;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.checkpoint-list {
+  display: grid;
+  gap: 10px;
+}
+
+.checkpoint-item {
+  display: grid;
+  grid-template-columns: minmax(220px, 1fr) auto;
+  gap: 12px;
+  align-items: center;
+  padding: 10px;
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  background: var(--input-bg);
+}
+
+.checkpoint-badges,
+.checkpoint-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 6px;
+}
+
+.checkpoint-actions {
+  justify-content: flex-end;
+  margin-top: 0;
+}
+
+.checkpoint-diff {
+  margin-top: 12px;
+}
+
+.diff-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+}
+
+.diff-grid pre {
+  max-height: 280px;
+  overflow: auto;
+  padding: 10px;
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  background: #151518;
+  white-space: pre-wrap;
+}
+
+.admin-row,
+.handover-row {
+  display: grid;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.admin-row {
+  grid-template-columns: minmax(160px, 1fr) auto;
+}
+
+.handover-row {
+  grid-template-columns: minmax(160px, 1fr) minmax(360px, auto);
+}
+
+.admin-row:last-child,
+.handover-row:last-child {
+  border-bottom: 0;
+}
+
+.admin-actions,
+.handover-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.handover-actions {
+  align-items: center;
+}
+
+.handover-actions select {
+  width: min(220px, 100%);
+}
+
+.team-wizard-row,
+.team-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 8px;
+}
+
+.team-wizard-row label {
+  flex: 1 1 220px;
+  display: grid;
+  gap: 6px;
+  color: var(--muted);
+  font-weight: 560;
+}
+
+.team-actions {
+  justify-content: flex-end;
+}
+
+.team-actions button,
+.admin-actions button,
+.handover-actions button {
+  min-height: 30px;
+  padding: 4px 10px;
+}
+
+@media (max-width: 720px) {
+  .handover-row {
+    grid-template-columns: 1fr;
+  }
+
+  .handover-actions {
+    justify-content: flex-start;
+  }
+}
+
+.tabs {
+  display: flex;
+  width: 100%;
+  gap: 4px;
+  margin-bottom: 18px;
+  padding: 4px;
+  background: var(--tint-neutral);
+  border-radius: 10px;
+}
+
+.tab {
+  flex: 1;
+  border: none;
+  background: transparent;
+  min-height: 30px;
+  border-radius: 7px;
+  color: var(--muted);
+}
+
+.tab:hover {
+  border: none;
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.tab.is-active {
+  background: var(--surface);
+  color: var(--text);
+  font-weight: 560;
+}
+
+/* One consistent vertical rhythm for every top-level block in a panel
+   (section head, grids, surfaces) — visible children only, so a hidden block
+   never leaves a phantom gap. */
+.panel {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.panel[hidden] {
+  display: none;
+}
+
+.section-head {
+  justify-content: space-between;
+  margin-bottom: 14px;
+}
+
+.section-head.compact {
+  margin-bottom: 10px;
+}
+
+/* A top-level section head is already spaced by the panel gap. */
+.panel > .section-head {
+  margin-bottom: 0;
+}
+
+.grid {
+  display: grid;
+  gap: 18px;
+}
+
+/* Blocks always stack in a single column so nothing gets clipped on narrower
+   windows; the reorderable blocks read top-to-bottom at every width. */
+.grid.two {
+  grid-template-columns: 1fr;
+}
+
+.surface {
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--surface);
+  padding: 16px;
+}
+
+.block {
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--surface);
+  overflow: hidden;
+}
+
+.block.is-dragging {
+  opacity: 0.55;
+  outline: 1px solid var(--accent);
+}
+
+.block-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 42px;
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--line);
+  background: color-mix(in srgb, var(--surface) 86%, #ffffff 14%);
+  cursor: pointer;
+}
+
+.block-collapse {
+  transition: transform 0.15s ease;
+}
+
+.block.is-collapsed .block-collapse {
+  transform: rotate(-90deg);
+}
+
+.block-title {
+  flex: 1;
+  min-width: 0;
+  font-weight: 620;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.block-drag,
+.block-collapse {
+  flex: none;
+  width: 28px;
+  min-height: 28px;
+  padding: 0;
+  display: grid;
+  place-items: center;
+  color: var(--muted);
+  background: var(--input-bg);
+}
+
+.block-drag {
+  cursor: grab;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+
+.block-drag:active {
+  cursor: grabbing;
+}
+
+.block-body:not(.has-surface) {
+  padding: 16px;
+}
+
+.block-body.has-surface > .surface {
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+}
+
+.block.is-collapsed .block-head {
+  border-bottom: 0;
+}
+
+.settings-stack {
+  display: grid;
+  gap: 18px;
+}
+
+.form-stack {
+  display: grid;
+  gap: 13px;
+  align-content: start;
+}
+
+/* Keep form controls aligned with the surface width. The app intentionally uses
+   the compact, stacked layout even on wide windows. */
+.form-stack input:not([type="checkbox"]),
+.form-stack select,
+.form-stack textarea,
+.form-stack .path-row,
+.form-stack .two-col {
+  width: 100%;
+  max-width: none;
+}
+
+.form-stack label {
+  display: grid;
+  gap: 6px;
+  color: var(--muted);
+  font-weight: 560;
+}
+
+.check-row {
+  display: flex !important;
+  grid-template-columns: none;
+  align-items: center;
+  gap: 9px;
+  color: var(--text) !important;
+}
+
+.check-row input {
+  width: 16px;
+  min-height: 16px;
+}
+
+.compact-check {
+  flex: 0 0 auto;
+}
+
+.inline-form {
+  margin-bottom: 14px;
+}
+
+.inline-form input:first-child {
+  flex: 1;
+}
+
+.inline-form input:nth-child(2) {
+  max-width: 160px;
+}
+
+.path-row input {
+  flex: 1;
+  min-width: 0;
+}
+
+.path-row select,
+.path-row textarea {
+  flex: 1;
+  min-width: 0;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th,
+td {
+  border-bottom: 1px solid var(--line);
+  padding: 9px 8px;
+  text-align: left;
+  vertical-align: middle;
+}
+
+th {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 680;
+  text-transform: uppercase;
+}
+
+tbody tr:hover {
+  background: color-mix(in srgb, var(--surface) 82%, #ffffff 8%);
+}
+
+td:last-child,
+th:last-child {
+  text-align: right;
+}
+
+/* Keep the actions column on one line; the table scrolls horizontally rather
+   than wrapping buttons onto a second row. */
+td:last-child {
+  white-space: nowrap;
+}
+
+.list {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.list li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 38px;
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  padding: 7px 10px;
+}
+
+.db-name-button {
+  border: none;
+  background: transparent;
+  color: var(--text);
+  padding: 2px 0;
+  min-height: 0;
+  font-weight: 560;
+}
+
+.db-name-button:hover {
+  border: none;
+  color: var(--accent);
+}
+
+.export-panel {
+  display: grid;
+  gap: 14px;
+  margin-top: 16px;
+  border-top: 1px solid var(--line);
+  padding-top: 16px;
+}
+
+.export-panel[hidden] {
+  display: none;
+}
+
+.export-grid,
+.option-grid {
+  display: grid;
+  gap: 12px;
+}
+
+.export-grid {
+  grid-template-columns: 1fr;
+}
+
+.option-grid {
+  grid-template-columns: 1fr;
+}
+
+.export-grid label {
+  display: grid;
+  gap: 6px;
+  color: var(--muted);
+  font-weight: 560;
+}
+
+.muted {
+  color: var(--muted);
+}
+
+.small {
+  font-size: 12px;
+}
+
+.danger {
+  color: var(--danger);
+}
+
+.head-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+button.primary {
+  border-color: var(--accent);
+  background: var(--accent);
+  color: #ffffff;
+}
+
+button.primary:hover {
+  background: var(--accent-dark);
+}
+
+.vm-controls button.primary {
+  border-color: var(--accent);
+  background: var(--accent);
+  color: #ffffff;
+}
+
+.hint {
+  margin: 0;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.stack {
+  display: grid;
+  gap: 14px;
+  align-content: start;
+}
+
+.pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 24px;
+  min-width: 46px;
+  padding: 2px 12px;
+  border-radius: 999px;
+  border: 1px solid transparent;
+  font-weight: 620;
+  font-size: 12px;
+  white-space: nowrap;
+}
+
+/* Reservation cell: let whole pills wrap as units instead of breaking text. */
+.pill-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.pill.on {
+  background: var(--tint-success);
+  color: var(--success);
+}
+
+.pill.off {
+  background: var(--tint-neutral);
+  color: var(--muted);
+}
+
+.is-off {
+  opacity: 0.62;
+}
+
+.host-group-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.host-group-name {
+  flex: 1;
+}
+
+.host-entries {
+  margin-bottom: 12px;
+}
+
+.host-entry {
+  gap: 10px;
+}
+
+.host-entry .host-ip {
+  min-width: 96px;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.host-entry .host-domain {
+  flex: 1;
+  font-weight: 560;
+}
+
+.host-add-entry input.host-add-ip {
+  max-width: 150px;
+}
+
+.host-remote {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.host-remote-body {
+  display: grid;
+  gap: 2px;
+  flex: 1;
+  min-width: 0;
+}
+
+.host-remote-body span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.remote-form {
+  margin-top: 14px;
+  padding-top: 14px;
+  border-top: 1px solid var(--line);
+}
+
+.link-danger {
+  border: none;
+  background: none;
+  color: var(--danger);
+  min-height: auto;
+  padding: 2px 4px;
+}
+
+.link-danger:hover {
+  text-decoration: underline;
+  border: none;
+}
+
+.table-chip {
+  min-height: 26px;
+  padding: 2px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.browse-results {
+  margin-top: 12px;
+}
+
+.table-scroll {
+  overflow-x: auto;
+  border: 1px solid var(--line);
+  border-radius: 7px;
+}
+
+.result-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+  white-space: nowrap;
+}
+
+.result-table th,
+.result-table td {
+  border-bottom: 1px solid var(--line);
+  padding: 6px 10px;
+  text-align: left;
+}
+
+.result-table th {
+  position: sticky;
+  top: 0;
+  background: var(--surface);
+  color: var(--muted);
+  font-weight: 560;
+}
+
+#browse-db {
+  width: auto;
+  min-width: 140px;
+}
+
+@media (max-width: 980px) {
+  .topbar,
+  .grid.two {
+    grid-template-columns: 1fr;
+  }
+
+  .topbar {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .vm-controls {
+    justify-content: flex-start;
+  }
+
+  .export-grid,
+  .option-grid,
+  .two-col {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 640px) {
+  .app-shell {
+    padding: 14px;
+  }
+
+  .tabs {
+    display: flex;
+    width: 100%;
+  }
+
+  .tab {
+    flex: 1;
+  }
+
+  th,
+  td {
+    padding: 8px 6px;
+  }
+}
+
+/* ===== FAQ / Anleitung ===== */
+.faq {
+  display: grid;
+  gap: 14px;
+  width: 100%;
+  max-width: 1040px;
+}
+
+.faq-lead {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.6;
+}
+
+.faq-toc {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+
+.faq-toc a {
+  padding: 6px 12px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--input-bg);
+  color: var(--text);
+  text-decoration: none;
+  font-size: 13px;
+  transition: border-color 0.15s ease, color 0.15s ease;
+}
+
+.faq-toc a:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.faq-h {
+  margin: 18px 0 2px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--line);
+  font-size: 17px;
+  scroll-margin-top: 12px;
+}
+
+.faq-card {
+  line-height: 1.6;
+}
+
+.faq-card h4 {
+  margin: 0 0 8px;
+  font-size: 15px;
+  color: var(--accent);
+}
+
+.faq-card p {
+  margin: 0 0 8px;
+}
+
+.faq-card p:last-child {
+  margin-bottom: 0;
+}
+
+.faq-card ul,
+.faq-card ol {
+  margin: 0 0 8px;
+  padding-left: 20px;
+  display: grid;
+  gap: 5px;
+}
+
+.faq-card li {
+  padding-left: 2px;
+}
+
+.faq-card code {
+  background: var(--input-bg);
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  padding: 1px 5px;
+  font-size: 12.5px;
+}
+
+.faq-card pre {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: auto;
+  margin: 8px 0;
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--input-bg);
+}
+
+.faq-card pre code {
+  display: block;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  white-space: pre;
+}
+
+.faq-dl {
+  margin: 0;
+  display: grid;
+  gap: 12px;
+}
+
+.faq-dl dt {
+  font-weight: 600;
+  margin-bottom: 3px;
+}
+
+.faq-dl dd {
+  margin: 0;
+  color: var(--muted);
+}
