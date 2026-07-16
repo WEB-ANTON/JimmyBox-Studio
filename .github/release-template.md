@@ -1,4 +1,4 @@
-# JimmyBox Studio v1.0.0 Solo
+# JimmyBox Studio v1.1.0 Solo
 
 First public Solo release of JimmyBox Studio for Apple Silicon Macs.
 
@@ -6,7 +6,7 @@ First public Solo release of JimmyBox Studio for Apple Silicon Macs.
 
 Download the signed and notarized DMG below:
 
-- `JimmyBox Studio-1.0.0-arm64.dmg`
+- `JimmyBox Studio-1.1.0-arm64.dmg`
 
 ## What's Included
 
@@ -46,4 +46,4 @@ Maintainer checklist before publishing:
 - Gatekeeper assessment returned `accepted`.
 - SHA-256 checksum recorded in the release description.
 
-For v1.0.0, use `docs/GITHUB_RELEASE_BODY_v1.0.0.md` as the final release body.
+For v1.1.0, use `docs/GITHUB_RELEASE_BODY_v1.1.0.md` as the final release body.

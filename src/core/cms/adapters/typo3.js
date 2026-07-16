@@ -43,10 +43,10 @@ module.exports = {
     // Match the TYPO3 core package (vendor/typo3/cms-core) or the public/typo3
     // runtime dir — not a bare vendor/typo3, which any project merely depending
     // on a standalone typo3/* library (e.g. phar-stream-wrapper) would have.
-    return exists(path.join(projectPath, 'vendor', 'typo3', 'cms-core')) ||
-      exists(path.join(projectPath, 'public', 'typo3')) ||
-      exists(path.join(projectPath, 'public', 'typo3conf', 'LocalConfiguration.php')) ||
-      exists(path.join(projectPath, 'public', 'typo3', 'sysext', 'core'));
+    return (await exists(path.join(projectPath, 'vendor', 'typo3', 'cms-core'))) ||
+      (await exists(path.join(projectPath, 'public', 'typo3'))) ||
+      (await exists(path.join(projectPath, 'public', 'typo3conf', 'LocalConfiguration.php'))) ||
+      (await exists(path.join(projectPath, 'public', 'typo3', 'sysext', 'core')));
   },
 
   async writeDbConfig({ projectPath, dbName }) {

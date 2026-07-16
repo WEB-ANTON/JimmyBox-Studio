@@ -42,7 +42,7 @@ npm run release:notarized
 The final file is written to:
 
 ```text
-dist/JimmyBox Studio-1.0.0-arm64.dmg
+dist/JimmyBox Studio-1.1.0-arm64.dmg
 ```
 
 Record the SHA-256 checksum from the script output.
@@ -52,18 +52,18 @@ Record the SHA-256 checksum from the script output.
 Recommended tag format:
 
 ```text
-v1.0.0
+v1.1.0
 ```
 
 Recommended release title:
 
 ```text
-JimmyBox Studio v1.0.0
+JimmyBox Studio v1.1.0
 ```
 
 Attach:
 
-- `dist/JimmyBox Studio-1.0.0-arm64.dmg`
+- `dist/JimmyBox Studio-1.1.0-arm64.dmg`
 - optional blockmap only if an updater starts using it
 
 Use `.github/release-template.md` as the release body.

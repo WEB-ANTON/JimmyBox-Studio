@@ -24,8 +24,8 @@ module.exports = {
   phpExtensions: ['curl', 'gd', 'intl', 'mbstring', 'mysqli', 'xml', 'zip'],
 
   async detect(projectPath) {
-    return exists(path.join(projectPath, 'public', 'configuration.php')) ||
-      exists(path.join(projectPath, 'configuration.php'));
+    return (await exists(path.join(projectPath, 'public', 'configuration.php'))) ||
+      (await exists(path.join(projectPath, 'configuration.php')));
   },
 
   async writeDbConfig() {

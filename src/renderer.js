@@ -40,6 +40,7 @@ const els = {
   activityTitle: document.querySelector('#activity-title'),
   activityCount: document.querySelector('#activity-count'),
   activitySteps: document.querySelector('#activity-steps'),
+  activityDismiss: document.querySelector('#activity-dismiss'),
   teamAdminPanel: document.querySelector('#team-admin-panel'),
   teamAdminUsers: document.querySelector('#team-admin-users'),
   teamAdminProjects: document.querySelector('#team-admin-projects'),
@@ -487,6 +488,13 @@ function activityCountText(record) {
   return count;
 }
 
+// A running step reads "Läuft… <task>" — the prefix carries the "in progress"
+// meaning, so trailing dots/ellipsis on the task text are stripped.
+function runningLabel(title) {
+  const clean = String(title || '').replace(/\s*[.…]+\s*$/, '').trim();
+  return clean ? `${t('activity.running')} ${clean}` : t('activity.running');
+}
+
 function activityStepHtml(step) {
   const state = step.success === false ? 'is-bad' : (step.skipped ? 'is-skip' : 'is-ok');
   const icon = step.success === false ? '✗' : (step.skipped ? '–' : '✓');
@@ -504,8 +512,9 @@ function renderActivitySteps(emptyText) {
   const rows = [];
   for (const record of activityRecords) {
     const state = record.running ? 'is-skip' : (record.success ? 'is-ok' : 'is-bad');
-    const icon = record.running ? '…' : (record.success ? '✓' : '✗');
-    rows.push(`<li class="${state}"><span class="activity-step-icon" aria-hidden="true">${icon}</span><span class="activity-step-name">${escapeHtml(record.title || t('activity.empty'))}</span></li>`);
+    const icon = record.running ? '' : (record.success ? '✓' : '✗');
+    const recordName = record.running ? runningLabel(record.title) : (record.title || t('activity.empty'));
+    rows.push(`<li class="${state}"><span class="activity-step-icon" aria-hidden="true">${icon}</span><span class="activity-step-name">${escapeHtml(recordName)}</span></li>`);
     if (record.steps.length) {
       rows.push(...record.steps.map((step) => activityStepHtml({
         ...step,
@@ -544,9 +553,9 @@ function setStatus({ id = '', title = '', steps = [], running = false, ok, empty
   els.activity.classList.toggle('is-ok', !running && success);
   els.activity.classList.toggle('is-bad', !running && !success);
 
-  els.activityIcon.textContent = running ? '…' : (success ? '✓' : '✗');
-  els.activityTitle.textContent = title || t('activity.empty');
-  els.activityCount.textContent = activityCountText(record);
+  els.activityIcon.textContent = running ? '' : (success ? '✓' : '✗');
+  els.activityTitle.textContent = running ? runningLabel(title) : (title || t('activity.empty'));
+  els.activityCount.textContent = running ? '' : activityCountText(record);
   renderActivitySteps(emptyText || title);
 
   // Expand automatically when something failed so the reason is visible; keep a
@@ -561,6 +570,27 @@ function setMessage(message, isError = false) {
     running: false,
     ok: !isError
   });
+}
+
+// Show a running indicator so the user knows something is in progress (e.g.
+// "Restoring checkpoint…" with a spinner). Call setMessage or showActivity
+// afterwards to set the final result.
+function setRunning(message) {
+  setStatus({
+    title: message,
+    steps: [],
+    running: true
+  });
+}
+
+// Dismiss the activity bar entirely so it disappears from the UI.
+function clearStatus() {
+  els.activity.hidden = true;
+  activityRecords.length = 0;
+  currentStatus.title = '';
+  currentStatus.steps = [];
+  currentStatus.running = false;
+  currentStatus.ok = true;
 }
 
 // One concise, collapsible activity line. Shows an overall pass/fail summary;
@@ -621,7 +651,7 @@ async function checkoutAndStart(domain, button) {
   const project = state.teamProjects.find((item) => item.domain === domain) || { domain };
   const confirmedCommands = confirmSetupCommands(project);
   return withBusy(button, async () => {
-    setMessage(t('msg.checkoutStart', { domain }));
+    setRunning(t('msg.checkoutStart', { domain }));
     showActivity(t('activity.checkout', { domain }), [], { running: true });
     const result = await window.api.team.checkout(domain, { confirmedCommands });
     showActivity(resultMessage(result, t('fb.checkoutStarted', { domain })), result.steps || [], { success: result.success });
@@ -1794,6 +1824,9 @@ function wireActivity() {
   els.activitySummary.addEventListener('click', () => {
     setActivityExpanded(els.activitySteps.hidden);
   });
+  if (els.activityDismiss) {
+    els.activityDismiss.addEventListener('click', () => clearStatus());
+  }
 }
 
 function wireImport() {
@@ -1808,7 +1841,7 @@ function wireImport() {
     const domain = els.importDomain.value.trim();
     if (!domain) { setMessage(t('import.needDomain'), true); return; }
     if (!els.importArchive.value) { setMessage(t('import.needArchive'), true); return; }
-    setMessage(t('import.running', { domain }));
+    setRunning(t('import.running', { domain }));
     showActivity(t('activity.import', { domain }), [], { running: true });
     const result = await window.api.projects.import({
       domain,
@@ -1854,7 +1887,7 @@ function wireTabs() {
 
 function wireVmControls() {
   els.vmStart.addEventListener('click', () => withBusy(els.vmStart, async () => {
-    setMessage(t('msg.vmStarting'));
+    setRunning(t('msg.vmStarting'));
     const result = await window.api.vm.start();
     setMessage(resultMessage(result, t('fb.start')), !result.success);
     await refreshVmStatus();
@@ -1865,14 +1898,14 @@ function wireVmControls() {
   }));
 
   els.vmStop.addEventListener('click', () => withBusy(els.vmStop, async () => {
-    setMessage(t('msg.vmStopping'));
+    setRunning(t('msg.vmStopping'));
     const result = await window.api.vm.stop();
     setMessage(resultMessage(result, t('fb.stop')), !result.success);
     await refreshVmStatus();
   }));
 
   els.vmProvision.addEventListener('click', () => withBusy(els.vmProvision, async () => {
-    setMessage(t('msg.vmProvisioning'));
+    setRunning(t('msg.vmProvisioning'));
     const result = await window.api.vm.provision();
     setMessage(resultMessage(result, t('fb.provision')), !result.success);
     await refreshVmStatus();
@@ -1910,7 +1943,7 @@ function wireProjects() {
       };
 
       const result = await window.api.projects.create(payload);
-      setMessage(resultMessage(result, t('fb.projectCreate')), !result.success);
+      reportSteps(t('activity.create', { domain }), result, t('fb.projectCreate'));
       if (result.success) {
         els.projectForm.reset();
         if (state.settings) {
@@ -1936,7 +1969,7 @@ function wireProjects() {
     if (openButton) {
       const domain = openButton.dataset.open;
       withBusy(openButton, async () => {
-        setMessage(t('msg.opening', { domain }));
+        setRunning(t('msg.opening', { domain }));
         const result = await window.api.projects.open(domain);
         setMessage(resultMessage(result, t('fb.opened', { domain })), !result.success);
         if (result.success) await refreshProjects();
@@ -1954,7 +1987,7 @@ function wireProjects() {
           setMessage(status.message || t('team.notConnectedShort'), true);
           return;
         }
-        setMessage(t('msg.pushing', { domain }));
+        setRunning(t('msg.pushing', { domain }));
         const result = await window.api.team.pushProject(domain);
         reportSteps(t('activity.push', { domain }), result, t('fb.pushed', { domain }));
         await Promise.all([refreshProjects(), refreshTeamProjects()]);
@@ -1972,6 +2005,7 @@ function wireProjects() {
     if (!confirmDelete(domain)) return;
 
     withBusy(deleteButton, async () => {
+      setRunning(t('activity.delete', { domain }));
       const result = await window.api.projects.delete(domain);
       reportSteps(t('activity.delete', { domain }), result, t('fb.projectDelete'));
       if (result.success) {
@@ -1986,7 +2020,7 @@ function wireProjects() {
     const domain = select.dataset.phpDomain;
     const version = select.value;
     withBusy(select, async () => {
-      setMessage(t('msg.switchingPhp', { domain, version }));
+      setRunning(t('msg.switchingPhp', { domain, version }));
       const result = await window.api.projects.setPhp(domain, version);
       setMessage(resultMessage(result, t('fb.phpSwitched', { domain, version })), !result.success);
       await refreshProjects();
@@ -2015,7 +2049,7 @@ function wireCheckpoints() {
       setMessage(t('history.needMessage'), true);
       return;
     }
-    setMessage(t('history.creating', { domain }));
+    setRunning(t('history.creating', { domain }));
     const result = await window.api.checkpoints.create({
       domain,
       message,
@@ -2055,6 +2089,8 @@ function wireCheckpoints() {
 
     withBusy(button, async () => {
       let result;
+      if (restore) setRunning(t('activity.restore', { domain }));
+      if (del) setRunning(t('activity.delete', { domain: checkpoint.message || id }));
       if (restore) result = await window.api.checkpoints.restore(domain, id);
       if (pin) result = await window.api.checkpoints.setPinned(domain, id, !checkpoint.pinned);
       if (del) result = await window.api.checkpoints.delete(domain, id);
@@ -2084,6 +2120,7 @@ function wireDatabase() {
   els.dbForm.addEventListener('submit', (event) => {
     event.preventDefault();
     withBusy(els.dbForm.querySelector('button[type="submit"]'), async () => {
+      setRunning(t('msg.creatingDb'));
       const result = await window.api.db.create(els.dbName.value.trim());
       setMessage(resultMessage(result, t('fb.dbCreate')), !result.success);
       if (result.success) {
@@ -2103,6 +2140,7 @@ function wireDatabase() {
         if (!ok) return;
       }
 
+      setRunning(t('msg.importingDb'));
       const result = await window.api.db.import({
         dbName,
         createIfMissing: els.dbImportCreate.checked
@@ -2140,6 +2178,7 @@ function wireDatabase() {
     if (!confirmDelete(name)) return;
 
     withBusy(button, async () => {
+      setRunning(t('msg.droppingDb', { db: name }));
       const result = await window.api.db.drop(name);
       setMessage(resultMessage(result, t('fb.dbDelete')), !result.success);
       if (result.success) {
@@ -2162,13 +2201,14 @@ function wireDatabase() {
         return;
       }
 
+      setRunning(t('msg.exportingDb'));
       const result = await window.api.db.export(payload);
       setMessage(result.path ? `${resultMessage(result, t('fb.dbExport'))} ${result.path}` : resultMessage(result, t('fb.dbExport')), !result.success);
     });
   });
 
   document.querySelector('#open-phpmyadmin').addEventListener('click', () => withBusy(null, async () => {
-    setMessage(t('msg.phpMyAdminPrep'));
+    setRunning(t('msg.phpMyAdminPrep'));
     const result = await window.api.db.openPhpMyAdmin();
     setMessage(resultMessage(result, t('fb.phpMyAdmin')), !result.success);
   }));
@@ -2233,7 +2273,7 @@ function wireTeam() {
       const domain = pullDb.dataset.teamPullDb;
       if (!confirm(t('confirm.pullDb', { domain }))) return;
       withBusy(pullDb, async () => {
-        setMessage(t('msg.pullingDb', { domain }));
+        setRunning(t('msg.pullingDb', { domain }));
         const result = await window.api.team.pullDatabase(domain);
         reportSteps(t('activity.pullDb', { domain }), result, t('fb.dbPulled', { domain }));
         await Promise.all([refreshProjects(), refreshTeamProjects(), refreshDatabases()]);
@@ -2245,7 +2285,7 @@ function wireTeam() {
       const domain = pushDb.dataset.teamPushDb;
       if (!confirm(t('confirm.pushDb', { domain }))) return;
       withBusy(pushDb, async () => {
-        setMessage(t('msg.pushingDb', { domain }));
+        setRunning(t('msg.pushingDb', { domain }));
         const result = await window.api.team.pushDatabase(domain);
         reportSteps(t('activity.pushDb', { domain }), result, t('fb.dbPushed', { domain }));
         await Promise.all([refreshProjects(), refreshTeamProjects(), refreshDatabases()]);
@@ -2257,7 +2297,7 @@ function wireTeam() {
       const domain = pullMedia.dataset.teamPullMedia;
       if (!confirm(t('confirm.pullMedia', { domain }))) return;
       withBusy(pullMedia, async () => {
-        setMessage(t('msg.pullingMedia', { domain }));
+        setRunning(t('msg.pullingMedia', { domain }));
         const result = await window.api.team.pullMedia(domain);
         reportSteps(t('activity.pullMedia', { domain }), result, t('fb.mediaPulled', { domain }));
         await Promise.all([refreshProjects(), refreshTeamProjects()]);
@@ -2269,7 +2309,7 @@ function wireTeam() {
       const domain = pushMedia.dataset.teamPushMedia;
       if (!confirm(t('confirm.pushMedia', { domain }))) return;
       withBusy(pushMedia, async () => {
-        setMessage(t('msg.pushingMedia', { domain }));
+        setRunning(t('msg.pushingMedia', { domain }));
         const result = await window.api.team.pushMedia(domain);
         reportSteps(t('activity.pushMedia', { domain }), result, t('fb.mediaPushed', { domain }));
         await Promise.all([refreshProjects(), refreshTeamProjects()]);
@@ -2383,7 +2423,7 @@ function wireHosts() {
   document.querySelector('#refresh-hosts').addEventListener('click', () => withBusy(null, refreshHosts));
 
   els.applyHosts.addEventListener('click', () => withBusy(els.applyHosts, async () => {
-    setMessage(t('msg.writingHosts'));
+    setRunning(t('msg.writingHosts'));
     const result = await window.api.hosts.apply();
     setMessage(resultMessage(result, t('fb.hostsUpdated')), !result.success);
   }));
@@ -2489,7 +2529,7 @@ function wireSettings() {
       setMessage(t('php.needVersion'), true);
       return;
     }
-    setMessage(t('msg.installingPhp', { version }));
+    setRunning(t('msg.installingPhp', { version }));
     const result = await window.api.php.install(version);
     setMessage(resultMessage(result, t('fb.phpInstall')), !result.success);
     if (result.success) {
@@ -2502,7 +2542,7 @@ function wireSettings() {
     const cpus = parseInt(els.settingsCpus.value, 10);
     const memory = parseInt(els.settingsMemory.value, 10);
     await window.api.settings.save({ cpus, memory });
-    setMessage(t('msg.applyingResources', { cpus, memory }));
+    setRunning(t('msg.applyingResources', { cpus, memory }));
     const result = await window.api.vm.setResources(cpus, memory);
     setMessage(resultMessage(result, t('fb.resourcesApplied')), !result.success);
     await refreshVmStatus();
@@ -2535,6 +2575,7 @@ function wireSettings() {
     event.preventDefault();
     withBusy(els.settingsForm.querySelector('button[type="submit"]'), async () => {
       const wasTeamMode = isTeamEnabled();
+      setRunning(t('msg.savingSettings'));
       const result = await saveSettingsFromForm();
       setMessage(result.success ? t('fb.settingsSaved') : resultMessage(result, t('fb.settingsSaved')), !result.success);
       if (result.success) {
@@ -2549,6 +2590,88 @@ function wireSettings() {
   });
 }
 
+// ---- First-run onboarding tutorial ----
+const TUTORIAL_STEPS = [
+  { key: 'welcome', tab: 'projects', highlight: null },
+  { key: 'vm', tab: 'projects', highlight: '.vm-controls' },
+  { key: 'projects', tab: 'projects', highlight: '.tab[data-tab="projects"]' },
+  { key: 'database', tab: 'database', highlight: '.tab[data-tab="database"]' },
+  { key: 'hosts', tab: 'hosts', highlight: '.tab[data-tab="hosts"]' },
+  { key: 'settings', tab: 'settings', highlight: '.tab[data-tab="settings"]' },
+  { key: 'faq', tab: 'faq', highlight: '.tab[data-tab="faq"]' },
+  { key: 'done', tab: 'projects', highlight: null }
+];
+const tut = {};
+let tutorialIndex = 0;
+
+function clearTutorialHighlight() {
+  document.querySelectorAll('.tutorial-highlight').forEach((el) => el.classList.remove('tutorial-highlight'));
+}
+
+function showTutorialStep(index) {
+  tutorialIndex = Math.max(0, Math.min(TUTORIAL_STEPS.length - 1, index));
+  const step = TUTORIAL_STEPS[tutorialIndex];
+  const tabBtn = document.querySelector(`.tab[data-tab="${step.tab}"]`);
+  if (tabBtn) tabBtn.click();
+  clearTutorialHighlight();
+  if (step.highlight) {
+    const target = document.querySelector(step.highlight);
+    if (target) target.classList.add('tutorial-highlight');
+  }
+  tut.title.textContent = t(`tutorial.${step.key}.title`);
+  tut.body.textContent = t(`tutorial.${step.key}.body`);
+  tut.progress.innerHTML = TUTORIAL_STEPS
+    .map((_, i) => `<span class="tutorial-dot${i === tutorialIndex ? ' is-active' : ''}"></span>`)
+    .join('');
+  tut.back.hidden = tutorialIndex === 0;
+  const last = tutorialIndex === TUTORIAL_STEPS.length - 1;
+  tut.next.textContent = last ? t('tutorial.finish') : t('tutorial.next');
+  tut.skip.hidden = last;
+}
+
+function startTutorial() {
+  if (!tut.overlay) return;
+  tutorialIndex = 0;
+  tut.overlay.hidden = false;
+  showTutorialStep(0);
+}
+
+async function endTutorial() {
+  clearTutorialHighlight();
+  if (tut.overlay) tut.overlay.hidden = true;
+  try {
+    if (state.settings) {
+      state.settings.onboardingDone = true;
+      await window.api.settings.save({ ...state.settings, onboardingDone: true });
+    }
+  } catch (_error) {
+    /* onboarding flag is best-effort — never block the app on it */
+  }
+}
+
+function wireTutorial() {
+  tut.overlay = document.querySelector('#tutorial-overlay');
+  if (!tut.overlay) return;
+  tut.title = document.querySelector('#tutorial-title');
+  tut.body = document.querySelector('#tutorial-body');
+  tut.progress = document.querySelector('#tutorial-progress');
+  tut.back = document.querySelector('#tutorial-back');
+  tut.next = document.querySelector('#tutorial-next');
+  tut.skip = document.querySelector('#tutorial-skip');
+  tut.next.addEventListener('click', () => {
+    if (tutorialIndex >= TUTORIAL_STEPS.length - 1) endTutorial();
+    else showTutorialStep(tutorialIndex + 1);
+  });
+  tut.back.addEventListener('click', () => showTutorialStep(tutorialIndex - 1));
+  tut.skip.addEventListener('click', () => endTutorial());
+  const restartBtn = document.querySelector('#restart-tutorial');
+  if (restartBtn) restartBtn.addEventListener('click', () => startTutorial());
+}
+
+function maybeStartTutorial() {
+  if (state.settings && !state.settings.onboardingDone) startTutorial();
+}
+
 async function boot() {
   wireTabs();
   wireActivity();
@@ -2561,6 +2684,7 @@ async function boot() {
   wireHosts();
   wireSettings();
   wireUiBlocks();
+  wireTutorial();
 
   if (window.api.hosts.onChanged) {
     window.api.hosts.onChanged(() => {
@@ -2593,6 +2717,8 @@ async function boot() {
   setInterval(() => {
     runReservationGuard().catch((error) => setMessage(error.message, true));
   }, RESERVATION_CHECK_MS);
+
+  maybeStartTutorial();
 }
 
 boot().catch((error) => {

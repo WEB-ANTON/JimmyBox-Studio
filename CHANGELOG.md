@@ -2,12 +2,13 @@
 
 All notable changes to JimmyBox Studio are documented here.
 
-## v1.0.0 Solo - 2026-07-08
+## v1.1.0 Solo - 2026-07-16
 
 Initial public Solo release.
 
 ### Added
 
+- Guided first-run tutorial that walks through the main areas and can be restarted anytime from Settings.
 - macOS desktop app for local PHP/CMS development on Apple Silicon.
 - Ubuntu 22.04 VM management through Lima and Apple's Virtualization.framework.
 - Apache, PHP-FPM, MariaDB, Redis, Composer, and common CMS runtime packages.
@@ -26,8 +27,8 @@ Initial public Solo release.
 - macOS release build: signed Developer ID application
 - Apple notarization: accepted
 - Gatekeeper assessment: accepted
-- Apple notarization submission: `c923062e-ccfb-427a-8f30-0bd298d35d85`
-- DMG SHA-256: `ee48c45da7fc0a11fc60228919baabdc1c7361c59e0292632d9e901ea586c794`
+- Apple notarization submission: `baaad0d9-4ba6-4eca-a9ba-ef7292303dfb`
+- DMG SHA-256: `c040dcbac0ff7894ef39d1572a068d630471c5437ebfb785ab179b207bef0371`
 
 ### Notes
 

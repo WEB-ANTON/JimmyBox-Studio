@@ -75,9 +75,9 @@ module.exports = {
   phpExtensions: ['curl', 'gd', 'intl', 'mbstring', 'mysqli', 'xml', 'zip'],
 
   async detect(projectPath) {
-    return exists(path.join(projectPath, 'vendor', 'contao')) ||
-      exists(path.join(projectPath, 'contao-manager.phar.php')) ||
-      exists(path.join(projectPath, 'web', 'contao-manager.phar.php'));
+    return (await exists(path.join(projectPath, 'vendor', 'contao'))) ||
+      (await exists(path.join(projectPath, 'contao-manager.phar.php'))) ||
+      (await exists(path.join(projectPath, 'web', 'contao-manager.phar.php')));
   },
 
   async writeDbConfig({ projectPath, dbName }) {

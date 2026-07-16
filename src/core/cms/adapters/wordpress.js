@@ -133,8 +133,8 @@ module.exports = {
   phpExtensions: ['curl', 'gd', 'intl', 'mbstring', 'mysqli', 'xml', 'zip'],
 
   async detect(projectPath) {
-    return exists(path.join(projectPath, 'public', 'wp-load.php')) ||
-      exists(path.join(projectPath, 'wp-load.php'));
+    return (await exists(path.join(projectPath, 'public', 'wp-load.php'))) ||
+      (await exists(path.join(projectPath, 'wp-load.php')));
   },
 
   async writeDbConfig({ projectPath, dbName, domain }) {

@@ -602,14 +602,15 @@ $cfg['Servers'][$i]['export_templates'] = 'pma__export_templates';
     "printf '%s\\n' 'phpmyadmin phpmyadmin/dbconfig-install boolean false' 'phpmyadmin phpmyadmin/reconfigure-webserver multiselect apache2' | sudo debconf-set-selections;",
     'sudo add-apt-repository -y universe || true;',
     'sudo apt-get update;',
-    'sudo DEBIAN_FRONTEND=noninteractive apt-get install -y phpmyadmin;',
+    'sudo DEBIAN_FRONTEND=noninteractive apt-get install -y phpmyadmin || { tmp="$(mktemp -d)"; curl -fsSL -o "$tmp/pma.zip" https://files.phpmyadmin.net/phpMyAdmin/5.2.1/phpMyAdmin-5.2.1-all-languages.zip; unzip -q "$tmp/pma.zip" -d "$tmp"; sudo rm -rf /usr/share/phpmyadmin; sudo cp -R "$tmp/phpMyAdmin-5.2.1-all-languages" /usr/share/phpmyadmin; rm -rf "$tmp"; };',
     'fi'
-  ].join(' ');
+  ].join('\n');
   const command = [
     'set -e',
     installCommand,
     `printf '%s' ${vm.shellQuote(encodedConfig)} | base64 -d | sudo tee /etc/apache2/conf-available/jimmybox-phpmyadmin.conf >/dev/null`,
-    `printf '%s' ${vm.shellQuote(encodedStorageConfig)} | base64 -d | sudo tee /etc/phpmyadmin/conf.d/jimmybox-studio.php >/dev/null`,
+    `printf '%s' ${vm.shellQuote(encodedStorageConfig)} | base64 -d | sudo tee /etc/phpmyadmin/conf.d/jimmybox-studio.php >/dev/null 2>&1 || true;`,
+    `printf '%s' ${vm.shellQuote(encodedStorageConfig)} | base64 -d | sudo tee /usr/share/phpmyadmin/config.inc.php >/dev/null; ` +
     `mysql -uroot -proot -e ${vm.shellQuote(setupStorageSql)}`,
     'pma_sql="$(find /usr/share/phpmyadmin /usr/share/doc/phpmyadmin -path "*/create_tables.sql" -print 2>/dev/null | head -1)"; if [ -n "$pma_sql" ]; then mysql -uroot -proot phpmyadmin < "$pma_sql"; fi',
     'sudo install -d -o www-data -g www-data -m 0750 /var/lib/phpmyadmin/tmp',
@@ -617,7 +618,7 @@ $cfg['Servers'][$i]['export_templates'] = 'pma__export_templates';
     'for version in /etc/php/*; do service="php$(basename "$version")-fpm"; if systemctl list-unit-files "$service.service" >/dev/null 2>&1; then sudo systemctl reload "$service" >/dev/null 2>&1 || sudo systemctl restart "$service" >/dev/null 2>&1 || true; fi; done',
     'sudo a2enconf jimmybox-phpmyadmin >/dev/null',
     'sudo systemctl reload apache2'
-  ].join(' && ');
+  ].join('\n');
 
   const result = await vm.shell(command);
   if (!result.success) return result;

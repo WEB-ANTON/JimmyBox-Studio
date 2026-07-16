@@ -32,8 +32,8 @@ module.exports = {
   phpExtensions: ['curl', 'gd', 'intl', 'mbstring', 'mysqli', 'xml', 'zip'],
 
   async detect(projectPath) {
-    return exists(path.join(projectPath, 'web', 'core', 'lib', 'Drupal.php')) ||
-      exists(path.join(projectPath, 'core', 'lib', 'Drupal.php'));
+    return (await exists(path.join(projectPath, 'web', 'core', 'lib', 'Drupal.php'))) ||
+      (await exists(path.join(projectPath, 'core', 'lib', 'Drupal.php')));
   },
 
   async writeDbConfig({ projectPath, dbName }) {

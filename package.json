@@ -1,6 +1,6 @@
 {
   "name": "jimmybox-studio",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "A standalone macOS desktop app for local JimmyBox Studio PHP and CMS development.",
   "main": "main.js",
   "productName": "JimmyBox Studio",
@@ -38,12 +38,18 @@
       "node_modules/**/*"
     ],
     "extraResources": [
-      { "from": "vendor/lima", "to": "lima" }
+      {
+        "from": "vendor/lima",
+        "to": "lima"
+      }
     ],
     "mac": {
       "category": "public.app-category.developer-tools",
       "target": [
-        { "target": "dmg", "arch": "arm64" }
+        {
+          "target": "dmg",
+          "arch": "arm64"
+        }
       ],
       "icon": "src/assets/icon.icns",
       "hardenedRuntime": true,

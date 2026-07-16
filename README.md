@@ -6,7 +6,7 @@ It is the desktop successor to the original JimmyBox Parallels/Vagrant workflow 
 
 ## Release Status
 
-Current release: **v1.0.0 Solo**
+Current release: **v1.1.0 Solo**
 
 This Solo release is intended for individual local development on a single Mac.
 
@@ -30,7 +30,7 @@ This Solo release is intended for individual local development on a single Mac.
 ## Install
 
 1. Open the latest GitHub Release.
-2. Download `JimmyBox Studio-1.0.0-arm64.dmg`.
+2. Download `JimmyBox Studio-1.1.0-arm64.dmg`.
 3. Open the DMG and drag JimmyBox Studio to Applications.
 4. Start JimmyBox Studio.
 5. Press **Start** to create and provision the local VM on first run.

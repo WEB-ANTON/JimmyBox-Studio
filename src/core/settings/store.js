@@ -3,6 +3,7 @@ const path = require('path');
 
 const DEFAULTS = {
   language: 'de',
+  onboardingDone: false,
   sitesPath: '~/JimmyboxStudio/Sites',
   basePlugins: '',
   defaultPhpVersion: '8.2',
@@ -80,6 +81,7 @@ function normalizeSettings(value) {
   );
   const next = {
     language,
+    onboardingDone: Boolean(value && value.onboardingDone),
     sitesPath: value && value.sitesPath ? String(value.sitesPath).trim() : DEFAULTS.sitesPath,
     basePlugins: value && value.basePlugins ? String(value.basePlugins).trim() : '',
     defaultPhpVersion: value && value.defaultPhpVersion ? String(value.defaultPhpVersion) : DEFAULTS.defaultPhpVersion,

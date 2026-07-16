@@ -22,12 +22,15 @@
       </header>
 
       <div id="activity" class="activity" role="status" aria-live="polite" hidden>
-        <button id="activity-summary" type="button" class="activity-summary" aria-expanded="false" aria-controls="activity-steps">
-          <span id="activity-icon" class="activity-icon" aria-hidden="true"></span>
-          <span id="activity-title" class="activity-title"></span>
-          <span id="activity-count" class="activity-count"></span>
-          <span class="activity-caret" aria-hidden="true">▾</span>
-        </button>
+        <div class="activity-head">
+          <button id="activity-summary" type="button" class="activity-summary" aria-expanded="false" aria-controls="activity-steps">
+            <span id="activity-icon" class="activity-icon" aria-hidden="true"></span>
+            <span id="activity-title" class="activity-title"></span>
+            <span id="activity-count" class="activity-count"></span>
+            <span class="activity-caret" aria-hidden="true">▾</span>
+          </button>
+          <button id="activity-dismiss" type="button" class="activity-dismiss" data-i18n-title="activity.dismiss" aria-label="Dismiss">×</button>
+        </div>
         <ol id="activity-steps" class="activity-steps" hidden></ol>
       </div>
 
@@ -319,6 +322,10 @@
                 <button id="apply-resources-btn" type="button" data-i18n="set.applyResources">Apply CPU / RAM to VM (restarts it)</button>
               </div>
             </div>
+            <div class="surface form-stack" data-block-id="settings-help" data-block-title="Help">
+              <p class="muted" data-i18n="tutorial.restartHint">New here? Replay the guided tour of the main areas.</p>
+              <button id="restart-tutorial" type="button" data-i18n="tutorial.restart">Show tutorial again</button>
+            </div>
             <button type="submit" data-i18n="set.save">Save Settings</button>
           </form>
         </section>
@@ -338,7 +345,6 @@
 
             <nav class="faq-toc">
               <a href="#faq-start-de">Schnellstart</a>
-              <a href="#faq-upgrade-de">Multiuser später</a>
               <a href="#faq-arch-de">Architektur</a>
               <a href="#faq-projects-de">Projekte</a>
               <a href="#faq-data-de">Daten &amp; DB</a>
@@ -351,24 +357,10 @@
               <dl class="faq-dl">
                 <dt>Ich arbeite alleine. Was muss ich tun?</dt>
                 <dd>App öffnen, <strong>Start</strong> drücken, warten bis die VM läuft, unter Projekte ein Projekt anlegen und mit <strong>Öffnen</strong> starten. Alles läuft lokal in JimmyBox Studio.</dd>
-                <dt>Kann ich später auf Multiuser wechseln?</dt>
-                <dd>Ja. Die Solo-App verwendet dieselbe App-ID, denselben App-Namen und dieselben lokalen Datenpfade. Projekte, VM, Datenbanken, Hosts-Einträge und lokale Checkpoints bleiben erhalten, wenn später die Multiuser-Version installiert wird.</dd>
                 <dt>Wo liegen lokale Projekte?</dt>
                 <dd>Standardmäßig in <code>~/JimmyboxStudio/Sites</code>. Der Pfad kann in den Einstellungen geändert werden. Die alte JimmyBox/Vagrant-Installation wird nicht angefasst.</dd>
                 <dt>Was brauche ich für den Alltag?</dt>
                 <dd>Die Projekttabelle, den Datenbankbereich, Hosts und Checkpoints. Alle wichtigen Aktionen laufen lokal in der App.</dd>
-              </dl>
-            </div>
-
-            <h3 id="faq-upgrade-de" class="faq-h">Später auf Multiuser wechseln</h3>
-            <div class="surface faq-card">
-              <dl class="faq-dl">
-                <dt>Was bleibt erhalten?</dt>
-                <dd>Die lokale VM, der Sites-Ordner, Projektdaten, Datenbanken, Hosts-Einstellungen, Checkpoints und kompatible Projekt-Metadaten bleiben am selben Ort.</dd>
-                <dt>Was ändert die Multiuser-Version?</dt>
-                <dd>Sie ergänzt Reservierungen, gemeinsames Auschecken, Push/Pull, Benutzer und Server-Synchronisation. Die Solo-Projekte müssen dafür nicht neu angelegt werden.</dd>
-                <dt>Was sollte ich vorher tun?</dt>
-                <dd>Vor dem Wechsel einen lokalen Checkpoint erstellen und die App schließen. Danach die Multiuser-App wie ein normales Update installieren.</dd>
               </dl>
             </div>
 
@@ -451,7 +443,6 @@
 
             <nav class="faq-toc">
               <a href="#faq-start-en">Quickstart</a>
-              <a href="#faq-upgrade-en">Multiuser later</a>
               <a href="#faq-arch-en">Architecture</a>
               <a href="#faq-projects-en">Projects</a>
               <a href="#faq-data-en">Data &amp; DB</a>
@@ -464,24 +455,10 @@
               <dl class="faq-dl">
                 <dt>I work alone. What do I need?</dt>
                 <dd>Open the app, press <strong>Start</strong>, wait for the VM, create a project under Projects, then press <strong>Open</strong>. Everything runs locally in JimmyBox Studio.</dd>
-                <dt>Can I add Multiuser later?</dt>
-                <dd>Yes. The Solo app uses the same app ID, app name, and local data paths. Projects, VM state, databases, hosts entries, and local checkpoints remain in place when the Multiuser app is installed later.</dd>
                 <dt>Where are local projects stored?</dt>
                 <dd>Default: <code>~/JimmyboxStudio/Sites</code>. You can change it in Settings. The legacy JimmyBox/Vagrant setup is not touched.</dd>
                 <dt>What do I use day to day?</dt>
                 <dd>The project table, database tools, hosts management, and checkpoints. All normal actions run locally in the app.</dd>
-              </dl>
-            </div>
-
-            <h3 id="faq-upgrade-en" class="faq-h">Upgrade To Multiuser Later</h3>
-            <div class="surface faq-card">
-              <dl class="faq-dl">
-                <dt>What is preserved?</dt>
-                <dd>The local VM, Sites folder, project files, databases, hosts settings, checkpoints, and compatible project metadata stay in the same place.</dd>
-                <dt>What does the Multiuser app add?</dt>
-                <dd>Reservations, shared checkout, push/pull, users, and server synchronization. Solo projects do not need to be recreated.</dd>
-                <dt>What should I do first?</dt>
-                <dd>Create a local checkpoint and quit the app. Then install the Multiuser app like a normal update.</dd>
               </dl>
             </div>
 
@@ -556,6 +533,21 @@
         </section>
       </main>
     </div>
+    <div id="tutorial-overlay" class="tutorial-overlay" hidden>
+      <div class="tutorial-card" role="dialog" aria-modal="true" aria-labelledby="tutorial-title">
+        <div id="tutorial-progress" class="tutorial-progress" aria-hidden="true"></div>
+        <h2 id="tutorial-title" class="tutorial-title"></h2>
+        <p id="tutorial-body" class="tutorial-body"></p>
+        <div class="tutorial-actions">
+          <button id="tutorial-skip" type="button" class="tutorial-skip" data-i18n="tutorial.skip">Skip tour</button>
+          <div class="tutorial-buttons">
+            <button id="tutorial-back" type="button" class="tutorial-back" data-i18n="tutorial.back">Back</button>
+            <button id="tutorial-next" type="button" class="tutorial-next" data-i18n="tutorial.next">Next</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <script src="./i18n.js"></script>
     <script src="./renderer.js"></script>
   </body>
